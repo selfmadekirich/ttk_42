@@ -1,0 +1,40 @@
+version: '3.9'
+
+volumes:
+  pg_data:
+
+networks:
+  pg-20-net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.78.0.0/28
+
+services:
+
+  datax_20_db: 
+    restart: always
+    container_name: datax-20-db
+    image: postgres:15.4
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+      TZ: Europe/Moscow
+      PGTZ: Europe/Moscow
+      
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    expose:
+      - "${POSTGRES_PORT}"
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "4096M"
+    networks: 
+      - pg-20-net
+    volumes:
+      - pg_data:/var/lib/postgresql/data
