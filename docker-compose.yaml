@@ -9,13 +9,13 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.78.0.0/28
+        - subnet: 172.80.0.0/28
 
 services:
 
-  datax_20_db: 
+  ttk_20_db: 
     restart: always
-    container_name: datax-20-db
+    container_name: ttk_20_db
     image: postgres:15.4
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
@@ -38,3 +38,4 @@ services:
       - pg-20-net
     volumes:
       - pg_data:/var/lib/postgresql/data
+      - ./init_db.sh:/docker-entrypoint-initdb.d/init_db.sh

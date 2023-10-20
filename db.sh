@@ -1,0 +1,1 @@
+SQL_SCRIPT=$(cat init.sql | tr -d '\n') && sed -e 's/<sql>/'"$SQL_SCRIPT"'/g' init_db.template > init_db.sh && chmod 755 ./init_db.sh
