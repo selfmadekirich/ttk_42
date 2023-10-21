@@ -1,49 +1,59 @@
 import asyncio
 import logging
 import sys
-from os import getenv
+import os
 import json
+#import pytesseract
+from dotenv import load_dotenv
+from aiogram import Bot, Dispatcher, Router,  F, types
 
-from aiogram import Bot, Dispatcher, Router, types
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message
-from aiogram.utils.markdown import hbold
-from aiogram.types.web_app_info import WebAppInfo
+from aiogram.types import FSInputFile
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
 
-TOKEN = getenv("TOKEN")
+load_dotenv()
+TOKEN = os.getenv("TOKEN")
+form_router = Router()
 
-dp = Dispatcher()
+class PasStates(StatesGroup):
+	AUTH = State()
+	NEEDTRAIN = State()
 
 def readStringFromFile(s):
-	with open("strings.json", "r", encoding='utf-8') as fh:
+	with open("Hakaton-bot\strings.json", "r", encoding='utf-8') as fh:
 		st = json.load(fh, )
 		return st[s]
 
-@dp.message(CommandStart())
-async def command_start_handler(message: Message) -> None:
-	'''
+@form_router.message(CommandStart())
+async def command_start_handler(message: Message, state: FSMContext) -> None:
+	await state.set_state(PasStates.AUTH)
+	res = readStringFromFile("hello")
+	cat = FSInputFile('Hakaton-bot\\images\\train.jpg')
+	await message.answer_photo(cat, caption=res)
+	await need_auth_mes(message)
+
+async def need_auth_mes(message: Message) -> None:
 	kb = [
-		[types.KeyboardButton(text='Открыть веб страницу', web_app=WebAppInfo(url='http://localhost:8000/'))]
+		[types.KeyboardButton(text='Регистрация')],
+		[types.KeyboardButton(text='Авторизация')]
 	]
 	markup = types.ReplyKeyboardMarkup(keyboard = kb)
-	await message.answer(f"Hello, {hbold(message.from_user.full_name)}!", reply_markup=markup)'''
-	res = readStringFromFile("hello")
-	await message.answer(res)
+	await message.answer(readStringFromFile("auth"), reply_markup=markup)
 
+@form_router.message(PasStates.AUTH)
+async def need_auth(message: Message, state: FSMContext) -> None:
+	await need_auth_mes(message)
 
-@dp.message()
-async def main_handler(message: types.Message) -> None:
-	try:
-		# Этапы приложения
-		# 
-		await message.send_copy(chat_id=message.chat.id)
-	except TypeError:
-		await message.answer("Nice try!")
-
+async def send_photo_handler(message: types.Message) -> None:
+	await message.answer(readStringFromFile("send_me"))
 
 async def main() -> None:
 	bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
+	dp = Dispatcher()
+	dp.include_router(form_router)
 	await dp.start_polling(bot)
 
 
