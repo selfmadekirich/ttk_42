@@ -97,7 +97,7 @@ $$
 LANGUAGE plpgsql VOLATILE SECURITY DEFINER;
 
 drop function if exists dev.add_ride(text,integer,integer,bigint);
-  CREATE OR REPLACE FUNCTION dev.add_ride (
+   CREATE OR REPLACE FUNCTION dev.add_ride (
     tr text,
     w int,
     p int,
@@ -109,7 +109,7 @@ DECLARE
     tr_id bigint;
     us_id bigint;
 BEGIN
-    tr_id := coalesce((select 1 from dev.train t where t.train = tr and t.wagon = w and t.place = p),0);
+    tr_id := coalesce((select t.train_id from dev.train t where t.train = tr and t.wagon = w and t.place = p),0);
     if tr_id = 0 then 
     	return 'Train not found. Check train information';
     end if;
