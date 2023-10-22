@@ -175,3 +175,33 @@ begin
 END;
 $$ 
 LANGUAGE plpgsql VOLATILE SECURITY DEFINER;
+
+
+
+drop function if exists dev.add_ride_by_passport(text,integer,bigint);
+ CREATE OR REPLACE FUNCTION dev.add_ride_by_passport (
+    s text,
+    n int,
+    tg_id bigint
+)
+RETURNS text
+AS $$
+DECLARE
+    tr_id bigint;
+    us_id bigint;
+BEGIN
+    tr_id := coalesce((select t.train_id from dev.passport_x_train t where t.pass_num = n and t.pass_ser = s),0);
+    if tr_id = 0 then 
+    	return 'Train not found. Check train information';
+    end if;
+    us_id := coalesce((select 1 from dev.user u where u.tb_login = tg_id),0);
+   if us_id = 0 then 
+    	return 'User not found';
+    end if;
+   insert into dev.ride(tg_login,train_id) values (tg_id,tr_id);
+   return 'ok';
+END;
+$$ 
+LANGUAGE plpgsql VOLATILE SECURITY DEFINER;
+
+insert into dev.passport_x_train(train_id,pass_ser ,pass_num ,user_name) values (1,'0000','000000','Иванов Иван Иваныч')
