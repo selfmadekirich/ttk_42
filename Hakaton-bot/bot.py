@@ -65,14 +65,14 @@ async def from_auth_or_reg(message: Message, state: FSMContext) -> None:
 			hash_object = hashlib.md5(bytes(data['password'],'utf-8'))
 			db_response = session.execute(func.dev.login(hash_object.hexdigest(),data['email'])).all()[0][0]
 			if db_response != 'ok':
-				await message.answer('lox')
+				await message.answer('Данные неверны. Повторите попытку')
 				return
 		if data['type'] == 'reg':
 			hash_object = hashlib.md5(bytes(data['password'],'utf-8'))
 			db_response = session.execute(func.dev.register(message.chat.id,hash_object.hexdigest(),data['email'])).all()[0][0]
 			session.commit()
 			if db_response != 'ok':
-				await message.answer('lox')
+				await message.answer('Данные неверны. Повторите попытку')
 				return
 	await state.set_state(PasStates.NEEDTRAIN)
 	await message.answer(message.web_app_data.data)
