@@ -86,27 +86,29 @@ async def need_auth(message: Message, state: FSMContext) -> None:
 async def need_train_mes(message: Message, state: FSMContext) -> None:
 	#!!! Тут мы сожрали фотку или документ на шаги когда он нам нужен
 	with Session() as session:
+		await message.answer(readStringFromFile("find"))
 		if message.content_type == 'photo':
 			path = 'chat_'+str(message.chat.id)
 			os.makedirs(path, exist_ok = True)
 			await message.bot.download(message.photo[-1],os.path.join(path,'photo.png'))
 			try:
 				data = img_proccessor.try_extract_data(os.path.join(path,'photo.png'))
-				await message.answer("Вот, что удалось распознать: " + data)
+				await message.answer("Вот, что удалось распознать: " + str(json.dumps(data,ensure_ascii=False).encode('utf8')))
 			except Exception as e:
-				await message.answer('Не удалось прочитать данные')
+				await message.answer('Не удалось прочитать данные:' + str(e))
+				return
 		if message.content_type == 'document':
 			path = 'chat_'+str(message.chat.id)
 			os.makedirs(path, exist_ok = True)
-			await message.bot.download(message.photo[-1],os.path.join(path,'photo.pdf'))
+			await message.bot.download(message.document,os.path.join(path,'photo.pdf'))
 			try:
 				data = img_proccessor.__try_extract_train_data__(os.path.join(path,'photo.pdf'))
-				await message.answer("Вот, что удалось распознать: " + data)
+				await message.answer("Вот, что удалось распознать: " + str(json.dumps(data,ensure_ascii=False).encode('utf8')))
 			except Exception as e:
-				await message.answer('Не удалось прочитать данные')
+				await message.answer('Не удалось прочитать данные:'+str(e))
+				return
 
 	await state.set_state(PasStates.MARKET)
-	await message.answer(readStringFromFile("find"))
 	await send_market(message)
 
 async def send_market(message: types.Message) -> None:

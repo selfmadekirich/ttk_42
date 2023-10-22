@@ -141,11 +141,11 @@ class ImgProccessor:
          
         
         '''
-        print(img_str)
+        #print(img_str)
         result = self.__try_extract_train_data__(img_str)
-        print(result)
+        #print(result)
         result_data = self.__try_extract_passport_data__(img_str)
-        print(result_data)
+        #print("res:",result_data)
         if result_data:
             return result_data
         if result:
