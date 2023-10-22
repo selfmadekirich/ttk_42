@@ -342,8 +342,8 @@ class ImgProccessor:
             mrzText = mrzText.replace(" ", "")
             print(mrzText)
 '''
-c = ImgProccessor()
+#c = ImgProccessor()
 #print('here:' + str(c.try_extract_data('chat_672125750/photo.png')))
-print('here:' + str(c.try_extract_data('test_img/my.png')))
+#print('here:' + str(c.try_extract_data('test_img/my.png')))
 #print(c.try_get_seria_number('test_img/passport.jpg'))
 #c.try_extract_data("test_img/my.png")
