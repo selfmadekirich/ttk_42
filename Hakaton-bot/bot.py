@@ -49,7 +49,8 @@ async def command_start_handler(message: Message, state: FSMContext) -> None:
 
 async def need_auth_mes(message: Message) -> None:
 	kb = [
-		[types.KeyboardButton(text='🔑Регистрация', web_app=WebAppInfo(url='https://127.0.0.1:5000/reg')), types.KeyboardButton(text='🚪Авторизация', web_app=WebAppInfo(url='https://127.0.0.1:5000/auth'))]
+		[types.KeyboardButton(text='🔑Регистрация', web_app=WebAppInfo(url='https://geluos.github.io/reg.html')),
+   		 types.KeyboardButton(text='🚪Авторизация', web_app=WebAppInfo(url='https://geluos.github.io/auth.html'))]
 	]
 	markup = types.ReplyKeyboardMarkup(row_width = 2, keyboard = kb)
 	await message.answer(readStringFromFile("auth"), reply_markup=markup)
@@ -110,7 +111,7 @@ async def need_train_mes(message: Message, state: FSMContext) -> None:
 
 async def send_market(message: types.Message) -> None:
 	kb = [
-		[types.KeyboardButton(text='Маркет', web_app=WebAppInfo(url='https://127.0.0.1:5000/market'))]
+		[types.KeyboardButton(text='Маркет', web_app=WebAppInfo(url='https://geluos.github.io/market.html'))]
 	]
 	markup = types.ReplyKeyboardMarkup(keyboard = kb)
 	await message.answer(readStringFromFile("sucess"), reply_markup=markup)
