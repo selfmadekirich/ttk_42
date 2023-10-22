@@ -1,0 +1,120 @@
+<div class = "maindiv">
+	<div class="title">РЖД МАРКЕТ <img class = "mimg" src = "{{ url_for('static', filename='images/market.png') }}"/> </div>
+	<div class="header">Вход</div>
+	<div class="myh">E-mail</div>
+	<input class="minp" type="text" id="email"></input>
+	<div class="myh">Пароль</div>
+	<input type="password" class="minp" type="text" id="pass"></input>
+</div>
+<div class = "buttonblock">
+	<button id = "closeButton"> Отмена</button>
+	<button id = "authButton"> Вход</button>
+</div>
+	<script src="https://telegram.org/js/telegram-web-app.js"></script>
+	<script>
+		let tg = window.Telegram.WebApp;
+		let authButton = document.getElementById("authButton");
+		authButton.addEventListener("click", () => {
+			let email = document.getElementById("email").value;
+			let password = document.getElementById("pass").value;
+
+			let data = {
+				type: "auth",
+				email: email,
+				password: password
+			}
+			tg.sendData(JSON.stringify(data));
+
+			tg.close();
+		});
+	</script>
+  <style>
+	.myh{
+		color: #404040;
+		font-family: Inter, sans-serif;
+		font-size: 16px;
+		font-weight: 400;
+		align-self: start;
+		margin-top: 13px;
+		text-wrap: nowrap;
+	}
+	.minp {
+		border-radius: 12px;
+		background-color: #f5f5f5;
+		align-self: start;
+		display: flex;
+		margin-top: 9px;
+		width: 100%;
+		height: 37px;
+		border-width: 0px;
+		flex-direction: column;
+	}
+	.title{
+		color: #404040;
+		text-align: center;
+		font-family: Roboto;
+		font-size: 16px;
+		font-style: normal;
+		font-weight: 500;
+		line-height: normal; 
+	}
+	.mimg{
+		width: 40px;
+		height: 30px;
+		flex-shrink: 0; 
+	}
+	.buttonblock{
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+	}
+	#closeButton{
+		width: 49%;
+		height: 43px;
+		background-color: #d9d9d9;
+		margin-right: -2px;
+		border-width: 0px;
+		color: #222;
+		font-family: Roboto;
+		font-size: 16px;
+		font-style: normal;
+		font-weight: 700;
+		line-height: normal; 
+	}
+	#authButton{
+		width: 49%;
+		height: 43px;
+		background: #FF5B5B; 
+		margin-right: -2px;
+		border-width: 0px;
+		color: #FFF;
+		font-family: Roboto;
+		font-size: 16px;
+		font-style: normal;
+		font-weight: 700;
+		line-height: normal; 
+	}
+	.maindiv {
+		background-color: #fff;
+		align-self: center;
+		display: flex;
+		margin-top: 20px;
+		width: 317px;
+		max-width: 100%;
+		flex-direction: column;
+		margin-left: auto;
+		margin-right: auto;
+		padding: 0 20px;
+	}
+	.header {
+		color: #404040;
+		font-family: Inter, sans-serif;
+		font-size: 24px;
+		font-weight: 700;
+		align-self: center;
+		margin-top: 63px;
+		text-wrap: nowrap;
+	}
+</style>
+  
