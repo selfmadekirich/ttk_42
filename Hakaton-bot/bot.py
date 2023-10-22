@@ -14,11 +14,18 @@ from aiogram.types import FSInputFile
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types.web_app_info import WebAppInfo
+from sqlalchemy.sql.expression import func
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+import hashlib
 
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
+SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
 dp = Dispatcher()
 form_router = Router()
+engine = create_engine(SQLALCHEMY_DATABASE_URI)
+Session = sessionmaker(engine)
 
 class PasStates(StatesGroup):
 	AUTH = State()
@@ -48,6 +55,22 @@ async def need_auth_mes(message: Message) -> None:
 @form_router.message(PasStates.AUTH, (F.content_type.in_({'web_app_data'})))
 async def from_auth_or_reg(message: Message, state: FSMContext) -> None:
 	#!!! Получили данные из реги/ауфа, type говорит auth или reg
+	with Session() as session:
+		data = json.loads(message.web_app_data.data)
+		db_response = ''
+		if data['type'] == 'auth':
+			hash_object = hashlib.md5(bytes(data['password'],'utf-8'))
+			db_response = session.execute(func.dev.login(hash_object.hexdigest(),data['email'])).all()[0][0]
+			if db_response != 'ok':
+				await message.answer('lox')
+				return
+		if data['type'] == 'reg':
+			hash_object = hashlib.md5(bytes(data['password'],'utf-8'))
+			db_response = session.execute(func.dev.register(message.chat.id,hash_object.hexdigest(),data['email'])).all()[0][0]
+			session.commit()
+			if db_response != 'ok':
+				await message.answer('lox')
+				return
 	await state.set_state(PasStates.NEEDTRAIN)
 	await message.answer(message.web_app_data.data)
 	await send_photo_handler(message)
@@ -59,6 +82,12 @@ async def need_auth(message: Message, state: FSMContext) -> None:
 @form_router.message(PasStates.NEEDTRAIN, (F.content_type.in_({'photo', "document"})))
 async def need_train_mes(message: Message, state: FSMContext) -> None:
 	#!!! Тут мы сожрали фотку или документ на шаги когда он нам нужен
+	with Session() as session:
+		train,wagon,place = '100',100,100
+		db_response = session.execute(func.dev.add_ride(train,wagon,place,message.chat.id)).all()[0][0]
+		if db_response != 'ok':
+			await message.answer(db_response)
+		session.commit()
 	await state.set_state(PasStates.MARKET)
 	await message.answer(readStringFromFile("find"))
 	await send_market(message)
