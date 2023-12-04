@@ -147,7 +147,9 @@ async def send_photo_handler(message: types.Message) -> None:
 
 @form_router.message(PasStates.MARKET, (F.content_type.in_({'web_app_data'})))
 async def from_auth_or_reg(message: Message, state: FSMContext) -> None:
+	data = json.loads(message.web_app_data.data)
 	await message.answer('Ваш заказ успешно принят в обработку')
+	await message.answer(f'Вы заказали: {", ".join(data["goods"])}')
 
 async def main() -> None:
 	bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
