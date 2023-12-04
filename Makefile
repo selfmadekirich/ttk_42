@@ -4,7 +4,6 @@ DOCKER_COMPOSE_FILE=docker-compose.yaml
 
 start: ##запуск необходимых для модуля контейнеров  в Docker
 	@echo "Module start containers [`pwd | xargs basename`], started"
-	@. ./db.sh
 	@docker compose --env-file ./.env  -f ./$(DOCKER_COMPOSE_FILE) up -d;	true;
 	@echo "Completed OK"
 

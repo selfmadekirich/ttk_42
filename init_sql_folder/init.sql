@@ -1,6 +1,6 @@
 create schema dev;
 
-
+drop table if not exists dev.user;
 create  table dev.user(
 	tb_login bigint not null,
 	pass_hash text not null,
@@ -8,7 +8,7 @@ create  table dev.user(
 	PRIMARY KEY(tb_login, pass_hash, email)
 );
 
-
+drop table if not exists dev.train;
  create  table dev.train(
     train_id serial primary key,
     train varchar(10) not null,
@@ -16,21 +16,21 @@ create  table dev.user(
 	place int not null
 );
 
-
+drop table if not exists dev.ride;
  create  table dev.ride(
     ride_id serial primary key,
 	tg_login bigint not null,
 	train_id bigint not null
 );
 
-
+drop table if not exists dev.order;
 create  table dev.order(
 	order_id SERIAL PRIMARY key,
 	item_id bigint not null,
 	comment text null
 );
 
-
+drop table if not exists dev.passport_x_train;
 create  table dev.passport_x_train(
 	train_id bigint not null,
 	user_name text not null,
@@ -38,7 +38,7 @@ create  table dev.passport_x_train(
 	pass_ser text not null
 );
 
-
+drop table if not exists dev.item;
 create  table dev.item(
 	item_id serial primary key,
 	name varchar(50) not null,
@@ -46,8 +46,8 @@ create  table dev.item(
 	img text not null
 );
 
-
-create  table dev.ride_x_item(
+drop table if not exists dev.ride_x_item;
+create table dev.ride_x_item(
 	train_id bigint not null,
 	wagon bigint not null,
 	item_id bigint not null,
@@ -76,7 +76,7 @@ END;
 $$ 
 LANGUAGE plpgsql VOLATILE SECURITY DEFINER;
 
-drop function dev.login(text,text);
+drop function if exists dev.login(text,text);
  CREATE OR REPLACE FUNCTION dev.login (
     pass text,
     ml text
@@ -123,25 +123,6 @@ END;
 $$ 
 LANGUAGE plpgsql VOLATILE SECURITY DEFINER;
 
-
-INSERT INTO dev.item (name, price, img, description) VALUES
-('Кола', 100, 'Кола.jpg', 'Газированный напиток с колой'),
-('Апельсиновый сок',100, 'Апельсиновый сок.jpg', 'Свежевыжатый апельсиновый сок'),
-('Чипсы', 150, 'Чипсы.jpg', 'Соленые чипсы'),
-('Попкорн', 160, 'Попкорн.jpg', 'Сладкий попкорн'),
-('Шоколад', 300, 'Шоколад.jpg', 'Молочный шоколад'),
-('Мармелад', 150, 'Мармелад.jpg', 'Разноцветный мармелад'),
-('Пицца', 120, 'Пицца.jpg', 'Пицца с разнообразными начинками'),
-('Бургер', 180, 'Бургер.jpg', 'Сочный бургер с картофелем фри');
-
-
-iNSERT INTO dev.train (train, wagon, place)
-SELECT
-'001А'::text AS train,
-1 as  wagon,
-1 AS place
-
-insert into dev.ride_x_item(train_id,wagon,item_id,quantity) values (1,1,1,10);
 
 drop function if exists dev.get_items_for_user(bigint);
  CREATE OR REPLACE FUNCTION dev.get_items_for_user (
@@ -205,3 +186,20 @@ $$
 LANGUAGE plpgsql VOLATILE SECURITY DEFINER;
 
 insert into dev.passport_x_train(train_id,pass_ser ,pass_num ,user_name) values (1,'0000','000000','Иванов Иван Иваныч')
+insert into dev.ride_x_item(train_id,wagon,item_id,quantity) values (1,1,1,10);
+iNSERT INTO dev.train (train, wagon, place)
+SELECT
+'001А'::text AS train,
+1 as  wagon,
+1 AS place;
+
+
+INSERT INTO dev.item (name, price, img, description) VALUES
+('Кола', 100, 'Кола.jpg', 'Газированный напиток с колой'),
+('Апельсиновый сок',100, 'Апельсиновый сок.jpg', 'Свежевыжатый апельсиновый сок'),
+('Чипсы', 150, 'Чипсы.jpg', 'Соленые чипсы'),
+('Попкорн', 160, 'Попкорн.jpg', 'Сладкий попкорн'),
+('Шоколад', 300, 'Шоколад.jpg', 'Молочный шоколад'),
+('Мармелад', 150, 'Мармелад.jpg', 'Разноцветный мармелад'),
+('Пицца', 120, 'Пицца.jpg', 'Пицца с разнообразными начинками'),
+('Бургер', 180, 'Бургер.jpg', 'Сочный бургер с картофелем фри');
