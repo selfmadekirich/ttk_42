@@ -125,34 +125,31 @@ LANGUAGE plpgsql VOLATILE SECURITY DEFINER;
 
 
 drop function if exists dev.get_items_for_user(bigint);
- CREATE OR REPLACE FUNCTION dev.get_items_for_user (
+CREATE OR REPLACE FUNCTION dev.get_items_for_user (
     tg_id bigint
 )
-RETURNS text
+RETURNS json
 AS $$
 DECLARE
     tr_id bigint;
     w int;
 begin
-	tr_id := coalesce((select 1 from dev.user u where u.tb_login = tg_id),0);
+    tr_id := coalesce((select 1 from dev.user u where u.tb_login = tg_id),0);
    if tr_id = 0 then 
-    	return 'User not found';
+        return json_build_object('Error','User not found');
     end if;
     tr_id := coalesce((select r.train_id from dev.ride r where r.tg_login = tg_id),0);
    if tr_id = 0 then 
-    	return 'Ride not found';
+        return json_build_object('Error','Ride not found');
     end if;
-   
-   return json_build_object('item_name',name,
-                            'price',price,
-                            'img_src',img,
-                            'quantity',quantity) item_info from(
+
+   return array_to_json(array_agg(row_to_json(a)))  from(
                             select name , price , img, quantity from dev.item i join 
                             dev.ride_x_item x on i.item_id = x.item_id
                             join dev.train t on t.train_id = x.train_id 
                             where t.train_id = tr_id and x.wagon = (select wagon from dev.train t1 where t1.train_id = tr_id)
                             ) a;
-                            
+
 END;
 $$ 
 LANGUAGE plpgsql VOLATILE SECURITY DEFINER;
@@ -201,3 +198,20 @@ INSERT INTO dev.item (name, price, img) VALUES
 ('Салат из свежих овощей', 160, 'Салат из свежих овощей.jpg'),
 ('Сбер.Кола', 300, 'coke.png'),
 ('Ужин в купейном вагоне', 150, 'Ужин в купейном вагоне (вегетарианский).jpg');
+
+
+iNSERT INTO dev.train (train, wagon, place)
+SELECT
+'820'::text AS train,
+4 as  wagon,
+77 AS place;
+
+
+INSERT INTO dev.ride
+(tg_login, train_id)
+VALUES(672125750,2);
+insert into dev.ride_x_item(train_id,wagon,item_id,quantity) values (2,4,2,10);
+insert into dev.ride_x_item(train_id,wagon,item_id,quantity) values (2,4,3,10);
+insert into dev.ride_x_item(train_id,wagon,item_id,quantity) values (2,4,4,10);
+insert into dev.ride_x_item(train_id,wagon,item_id,quantity) values (2,4,5,10);
+insert into dev.ride_x_item(train_id,wagon,item_id,quantity) values (2,4,6,10);
