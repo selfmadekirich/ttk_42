@@ -19,6 +19,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import hashlib
 from img_proccesing import ImgProccessor
+from urllib.parse import quote as urlparse
 
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
@@ -44,6 +45,9 @@ def readStringFromFile(s):
 	with open("Hakaton-bot\strings.json", "r", encoding='utf-8') as fh:
 		st = json.load(fh, )
 		return st[s]
+	
+def dict_to_url_params(params: dict):
+    return "?" + '&'.join([f'{ urlparse(key) }={ urlparse(",".join(value)) }' for key, value in params.items()])
 
 @form_router.message(CommandStart())
 async def command_start_handler(message: Message, state: FSMContext) -> None:
@@ -121,11 +125,21 @@ async def need_train_mes(message: Message, state: FSMContext) -> None:
 	await send_market(message)
 
 async def send_market(message: types.Message) -> None:
-	kb = [
-		[types.KeyboardButton(text='Маркет', web_app=WebAppInfo(url='https://geluos.github.io/market.html'))]
+	with Session() as session:
+		db_response = session.execute(func.dev.get_items_for_user(message.chat.id)).all()[0][0]
+		print(db_response)
+		if type(db_response) is dict and "Error" in db_response.keys():
+			await message.answer(db_response['Error'])
+			return
+		params = {"photos":[x['img'] for x in db_response],
+				  "prices":[str(x['price']) for x in db_response],
+				  "names":[x['name'] for x  in db_response]}
+		params_str = dict_to_url_params(params)
+		kb = [
+		[types.KeyboardButton(text='Маркет', web_app=WebAppInfo(url='https://geluos.github.io/market.html'+params_str))]
 	]
-	markup = types.ReplyKeyboardMarkup(keyboard = kb)
-	await message.answer(readStringFromFile("sucess"), reply_markup=markup)
+		markup = types.ReplyKeyboardMarkup(keyboard = kb)
+		await message.answer(readStringFromFile("sucess"), reply_markup=markup)
 
 async def send_photo_handler(message: types.Message) -> None:
 	markup = types.ReplyKeyboardRemove()
