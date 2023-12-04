@@ -34,6 +34,12 @@ class PasStates(StatesGroup):
 	NEEDTRAIN = State()
 	MARKET = State()
 
+def validate_param(param):
+	return  param is not None and param != ''
+
+def validate(params:list):
+	return all(map(lambda x: validate_param(x),params))
+
 def readStringFromFile(s):
 	with open("Hakaton-bot\strings.json", "r", encoding='utf-8') as fh:
 		st = json.load(fh, )
@@ -60,6 +66,9 @@ async def from_auth_or_reg(message: Message, state: FSMContext) -> None:
 	#!!! Получили данные из реги/ауфа, type говорит auth или reg
 	with Session() as session:
 		data = json.loads(message.web_app_data.data)
+		if not validate([data['password'],data['email']]):
+			await message.answer('Обязательные поля не могут быть пустыми!')
+			return
 		db_response = ''
 		if data['type'] == 'auth':
 			hash_object = hashlib.md5(bytes(data['password'],'utf-8'))
