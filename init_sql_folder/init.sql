@@ -1,6 +1,6 @@
 create schema dev;
 
-drop table if not exists dev.user;
+drop table if  exists dev.user;
 create  table dev.user(
 	tb_login bigint not null,
 	pass_hash text not null,
@@ -8,7 +8,7 @@ create  table dev.user(
 	PRIMARY KEY(tb_login, pass_hash, email)
 );
 
-drop table if not exists dev.train;
+drop table if  exists dev.train;
  create  table dev.train(
     train_id serial primary key,
     train varchar(10) not null,
@@ -16,21 +16,21 @@ drop table if not exists dev.train;
 	place int not null
 );
 
-drop table if not exists dev.ride;
+drop table if  exists dev.ride;
  create  table dev.ride(
     ride_id serial primary key,
 	tg_login bigint not null,
 	train_id bigint not null
 );
 
-drop table if not exists dev.order;
+drop table if exists dev.order;
 create  table dev.order(
 	order_id SERIAL PRIMARY key,
 	item_id bigint not null,
 	comment text null
 );
 
-drop table if not exists dev.passport_x_train;
+drop table if  exists dev.passport_x_train;
 create  table dev.passport_x_train(
 	train_id bigint not null,
 	user_name text not null,
@@ -38,7 +38,7 @@ create  table dev.passport_x_train(
 	pass_ser text not null
 );
 
-drop table if not exists dev.item;
+drop table if  exists dev.item;
 create  table dev.item(
 	item_id serial primary key,
 	name varchar(50) not null,
@@ -46,7 +46,7 @@ create  table dev.item(
 	img text not null
 );
 
-drop table if not exists dev.ride_x_item;
+drop table if exists dev.ride_x_item;
 create table dev.ride_x_item(
 	train_id bigint not null,
 	wagon bigint not null,
@@ -185,7 +185,7 @@ END;
 $$ 
 LANGUAGE plpgsql VOLATILE SECURITY DEFINER;
 
-insert into dev.passport_x_train(train_id,pass_ser ,pass_num ,user_name) values (1,'0000','000000','Иванов Иван Иваныч')
+insert into dev.passport_x_train(train_id,pass_ser ,pass_num ,user_name) values (1,'0000','000000','Иванов Иван Иваныч');
 insert into dev.ride_x_item(train_id,wagon,item_id,quantity) values (1,1,1,10);
 iNSERT INTO dev.train (train, wagon, place)
 SELECT
@@ -194,10 +194,10 @@ SELECT
 1 AS place;
 
 
-INSERT INTO dev.item (name, price, img, description) VALUES
-('Завтрак в вагоне СВ', 100, 'Завтрак в вагоне СВ.jpg', 'Вкуснейшикй завтрак в вагоне СВ'),
-('Обед в купейном вагоне',100, 'Обед в купейном вагоне (детский).jpg', 'Обед в купейном вагоне для тех, кто чувствует себя ребенком!'),
-('Сэндвич с сыром', 150, 'Сэндвич с сыром.jpg', 'Сэндвич с непростым сыром'),
-('Салат из свежих овощей', 160, 'Салат из свежих овощей.jpg', 'Сладкий попкорн'),
-('Сбер.Кола', 300, 'coke.png', 'Сбер добрался даже сюда! Попробуйте новую зеленую колу!'),
-('Ужин в купейном вагоне', 150, 'Ужин в купейном вагоне (вегетарианский).jpg', 'Ужин в купейном вагоне для тех,кто не есть мясо');
+INSERT INTO dev.item (name, price, img) VALUES
+('Завтрак в вагоне СВ', 100, 'Завтрак в вагоне СВ.jpg'),
+('Обед в купейном вагоне',100, 'Обед в купейном вагоне (детский).jpg'),
+('Сэндвич с сыром', 150, 'Сэндвич с сыром.jpg'),
+('Салат из свежих овощей', 160, 'Салат из свежих овощей.jpg'),
+('Сбер.Кола', 300, 'coke.png'),
+('Ужин в купейном вагоне', 150, 'Ужин в купейном вагоне (вегетарианский).jpg');
